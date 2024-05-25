@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              Int       @id @default(autoincrement())
+  nickname        String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  activationCode  String?
+  expirationDate  DateTime?
+  extendedInfo    Json?
+  status          String?
+  notes           String?
+  inviterId       Int?
+  openid          String?   // 新添加的openid字段
+  conversation_id String?
+}
+
+model Session {
+  id            Int       @id @default(autoincrement())
+  title         String
+  userId        Int       // 关联到用户表中的用户id
+  createdAt     DateTime  @default(now())
+  expirationDate DateTime
+  updatedAt     DateTime  @updatedAt
+  status        String?
+  notes         String?
+  conversation_id String?
+}
+
+model AdminUser {
+  id         Int      @id @default(autoincrement())
+  username   String   @unique
+  password   String
+  createdAt  DateTime @default(now())
+  status     String?
+  role       String
+}
+
+model RedemptionCode {
+  id             Int      @id @default(autoincrement())
+  code           String   @unique
+  createdAt      DateTime @default(now())
+  status         String?
+  creatorId      Int      // 关联到管理员用户表的id
+  verificationTime DateTime?
+  boundPersonId   Int?     // 关联到用户表中的绑定人id
+}
+

@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+.tech-background {
+  overflow: hidden;
+  background: #34e89e;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #0f3443, #34e89e);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #0f3443, #34e89e); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.blur-effect{
+  position: relative;
+  height: calc(100% - 40px);
+}
+/* 半透明浅灰色磨砂玻璃效果 css 样式 */
+.blur-effect::before {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  /* 设置边框（可选） */
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  /* 设置背景颜色为半透明浅灰色 */
+  background-color: rgba(41, 41, 41, 0.2);
+  /* 设置磨砂效果 */
+  backdrop-filter: blur(10px);
+  /* 比较圆滑的边角 */
+  border-radius: 10px;
+  /* 盒子阴影（可选） */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  /* 内容的一些内边距样式 */
+  padding: 20px;
+  /* filter: blur(10px); */
+  /* -webkit-filter: blur(10px); */
+}
+:where(.css-dev-only-do-not-override-1okl62o).ant-list-split .ant-list-item {
+  border-block-end: none !important;
+}

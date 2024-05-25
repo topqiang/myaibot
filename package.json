@@ -1,0 +1,35 @@
+{
+  "name": "my-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.8.0-integration-fix-client-performance-global-polyfill.1",
+    "@types/node": "20.10.5",
+    "@types/react": "18.2.45",
+    "@types/react-dom": "18.2.17",
+    "antd": "^5.17.0",
+    "autoprefixer": "10.4.16",
+    "babel-plugin-import": "^1.13.8",
+    "cookie": "^0.6.0",
+    "eslint": "8.56.0",
+    "eslint-config-next": "14.0.4",
+    "ioredis": "^5.4.1",
+    "next": "14.0.4",
+    "postcss": "8.4.32",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-markdown": "^9.0.1",
+    "tailwindcss": "3.3.6",
+    "typescript": "5.3.3"
+  },
+  "devDependencies": {
+    "@types/cookie": "^0.6.0",
+    "prisma": "^5.7.0-integration-fix-pg-esm.2"
+  }
+}
