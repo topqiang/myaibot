@@ -1,5 +1,6 @@
 import prisma from '../prismaClient';
 import fetchWrapper from '@/utils/fetchWrapper';
+import { getCache } from '../redisio';
 // @ts-ignore
 export default async ({req, res, params, query}, user) => {
   const conversation = await prisma.session.findMany({
@@ -10,6 +11,7 @@ export default async ({req, res, params, query}, user) => {
       }
     }
   });
+  let messageList = '';
   if(!user?.conversation_id || conversation.length === 0){
     // 调用百度创建会话
     const a = await fetchWrapper("/v2/app/conversation");
@@ -36,5 +38,10 @@ export default async ({req, res, params, query}, user) => {
     });
     user.conversation_id = a?.conversation_id;
   }
-  return user;
+  messageList = await getCache(user.conversation_id);
+
+  return {
+    user,
+    messageList
+  };
 };

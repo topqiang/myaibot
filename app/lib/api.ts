@@ -40,7 +40,7 @@ const request = async (
 
   try {
     const response = await fetch(url, requestOptions);
-    return handleRequestError(response);
+    return await handleRequestError(response);
   } catch (error: any) {
     throw new Error(error.message || '网络请求异常，请稍后重试');
   }

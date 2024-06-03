@@ -1,9 +1,10 @@
 "use client"
 import { Input, Tooltip, Spin, Modal } from "antd"
-import { SwapOutlined, SettingOutlined, LoadingOutlined} from "@ant-design/icons"
+import { LoadingOutlined} from "@ant-design/icons"
 import { useCallback, useEffect, useState, useRef } from "react";
 import { SendIcon, UserInfo, ChatList, Messages } from "@/app/ui/component/index";
-
+import api from '@/app/lib/api';
+import { throttle } from "@/app/lib/utils";
 const data: IMessage[] = [
   {
     message_id: '1',
@@ -31,11 +32,11 @@ function parseData(data: string) {
 }
 
 // @ts-ignore
-export default function Chat({user}) {
+export default function Chat({user, messageList: defaultMessageList}) {
   // 用户输入问题的临时变量
   const [question, setQuestion] = useState("");
   const chatContainerRef = useRef(null);
-  const [messageList, setMessageList] = useState<IMessage[]>(data);
+  const [messageList, setMessageList] = useState<IMessage[]>(defaultMessageList?.length > 0 ? defaultMessageList : data);
   const [loading, setLoading] = useState(false);
   const [modal, contextHolder] = Modal.useModal();
   const chat = useCallback(() => {
@@ -121,10 +122,17 @@ export default function Chat({user}) {
   };
 
   useEffect(() => {
-    if(chatContainerRef?.current){
+    if (chatContainerRef?.current) {
       // @ts-ignore
       chatContainerRef.current.scrollTop = chatContainerRef.current?.scrollHeight;
     }
+    const callFn = throttle(() => {
+      api("/api/chat/save", {
+        conversation_id: user?.conversation_id,
+        messageList
+      });
+    }, 2000);
+    callFn();
   }, [messageList, chatContainerRef]);
 
   return (
