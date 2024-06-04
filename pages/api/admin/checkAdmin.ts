@@ -6,15 +6,15 @@ export default async ({req, res, params, query}) => {
   // 获取请求中的 cookie
   const cookieHeader = req.headers.cookie;
   const host: string = req.headers.host;
+  const protocol = req.headers['x-forwarded-proto'] || 'http';
   let cookie = cookieHeader ? parse(cookieHeader) : {};
   // if(host.includes("localhost")){
   //   //@ts-ignore
   //   cookie.adminId = 1;
   // }
   let user;
-  console.log("admin", query, host);
   if(!cookie?.adminId){
-    const authUrl = `http://` + host + '/admin/login';
+    const authUrl = `${protocol}://${host}/admin/login`;
     res.writeHead(302, { Location: authUrl });
     res.end();
     return null;
