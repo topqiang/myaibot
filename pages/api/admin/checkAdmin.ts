@@ -12,7 +12,10 @@ export default async ({req, res, params, query}) => {
   //   //@ts-ignore
   //   cookie.adminId = 1;
   // }
-  let user;
+  let user: any = {
+    username: "",
+    id: ""
+  };
   if(!cookie?.adminId){
     const authUrl = `${protocol}://${host}/admin/login`;
     res.writeHead(302, { Location: authUrl });

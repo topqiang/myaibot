@@ -25,7 +25,7 @@ const CouponList: React.FC = () => {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: value =>{
+      render: (value: number) =>{
         return value != 0 ? "已激活" : "未启用"
       }
     },
