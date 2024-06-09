@@ -1,83 +1,63 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Button,
-  Cascader,
-  DatePicker,
-  Form,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  Switch,
-  TreeSelect,
+  List,
+  message
 } from 'antd';
+import api from '@/app/lib/api';
 
-type SizeType = Parameters<typeof Form>[0]['size'];
+const App: React.FC<{userId: number}> = ({
+  userId
+}) => {
+  const [list, setList] = useState([]);
+  const getList = useCallback(async () => {
+    const res = await api("api/session", {
+      userId,
+      page: 1,
+      pageSize: 100
+    });
+    if(!res?.code){
+      setList(res?.result?.sessionList)
+    }
+    console.log(list, "----listlistlist");
+  }, []);
 
+  useEffect(() => {
+    getList();
+  }, []);
 
-const App: React.FC = () => {
-  const [componentSize, setComponentSize] = useState<SizeType | 'default'>('default');
-  const onFormLayoutChange = ({ size }: { size: SizeType }) => {
-    setComponentSize(size);
-  };
+  const setDefaultConvosation = useCallback((conversation_id: string) => {
+    api("/api/session/saveForUser",{
+      userId,
+      conversation_id
+    }).then(res => {
+      if(!res?.code){
+        message.success("设置成功！");
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    });
+  }, [userId]);
 
   return (
-    <Form
-      labelCol={{ span: 4 }}
-      wrapperCol={{ span: 14 }}
-      layout="horizontal"
-      className="h-96 overflow-y-auto w-full"
-      initialValues={{ size: componentSize }}
-      onValuesChange={onFormLayoutChange}
-      size={componentSize as SizeType}
-    >
-      <Form.Item label="Form Size" name="size">
-        <Radio.Group>
-          <Radio.Button value="small">Small</Radio.Button>
-          <Radio.Button value="default">Default</Radio.Button>
-          <Radio.Button value="large">Large</Radio.Button>
-        </Radio.Group>
-      </Form.Item>
-      <Form.Item label="Input">
-        <Input />
-      </Form.Item>
-      <Form.Item label="Select">
-        <Select>
-          <Select.Option value="demo">Demo</Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item label="TreeSelect">
-        <TreeSelect
-          treeData={[
-            { title: 'Light', value: 'light', children: [{ title: 'Bamboo', value: 'bamboo' }] },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item label="Cascader">
-        <Cascader
-          options={[
-            {
-              value: 'zhejiang',
-              label: 'Zhejiang',
-              children: [{ value: 'hangzhou', label: 'Hangzhou' }],
-            },
-          ]}
-        />
-      </Form.Item>
-      <Form.Item label="DatePicker">
-        <DatePicker />
-      </Form.Item>
-      <Form.Item label="InputNumber">
-        <InputNumber />
-      </Form.Item>
-      <Form.Item label="Switch" valuePropName="checked">
-        <Switch />
-      </Form.Item>
-      <Form.Item label="Button">
-        <Button>Button</Button>
-      </Form.Item>
-    </Form>
+    <List
+      size="large"
+      bordered
+      dataSource={list}
+      renderItem={(item) => (
+        <List.Item
+          actions={[<Button
+            onClick={() => {
+              setDefaultConvosation(item?.conversation_id);
+            }}
+          >切换到当前会话</Button>]}
+        >
+          {item?.title || item?.conversation_id}
+        </List.Item>
+      )}
+    />
   );
 };
 

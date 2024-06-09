@@ -65,3 +65,6 @@ body {
 :where(.css-dev-only-do-not-override-1okl62o).ant-list-split .ant-list-item {
   border-block-end: none !important;
 }
+.ant-list-item {
+  border-block-end: none !important;
+}

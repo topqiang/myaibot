@@ -37,9 +37,31 @@ export default async ({req, res, params, query}, user) => {
       }
     });
     user.conversation_id = a?.conversation_id;
+  }else if( !user.conversation_id ){
+    await prisma.user.update({
+      where:{
+        id: user?.id,
+      },
+      data: {
+        conversation_id: conversation[0].conversation_id
+      }
+    });
+    user.conversation_id = conversation[0].conversation_id
+  }else{
+    const conversationIsInvalid = conversation.find(v => v.conversation_id === user.conversation_id);
+    if(!conversationIsInvalid){
+      await prisma.user.update({
+        where:{
+          id: user?.id,
+        },
+        data: {
+          conversation_id: conversation[0].conversation_id
+        }
+      });
+    }
+    user.conversation_id = conversation[0].conversation_id
   }
   messageList = await getCache(user.conversation_id);
-
   return {
     user,
     messageList

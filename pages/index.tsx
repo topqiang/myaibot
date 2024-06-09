@@ -17,7 +17,7 @@ export default function Index({user, messageList}) {
       <footer style={{
         height: "40px"
       }} className="text-center opacity-50 flex-none">
-        星哥小秘 ©{new Date().getFullYear()} Created by 星哥智能化规划研究室
+        星哥小秘 ©{new Date().getFullYear()} Created by 星哥智能规划研究室
       </footer>
     </div>
   )
@@ -37,7 +37,7 @@ export async function getServerSideProps(context) {
       }
     }
   }
-  
+  console.log(user, "----user");
   // 将用户信息作为 prop 传递给页面
   return { props: {
       user: {

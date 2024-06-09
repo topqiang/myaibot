@@ -17,7 +17,6 @@ export default async ({req, res, params, query}) => {
   const host: string = req.headers.host;
   let cookie = cookieHeader ? parse(cookieHeader) : {};
   // 在控制台输出 cookie
-  console.log('Request Cookie:', host, cookie, params);
   if(host.includes("localhost")){
     //@ts-ignore
     cookie.userId = 5;
