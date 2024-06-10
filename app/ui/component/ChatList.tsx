@@ -55,6 +55,7 @@ const App: React.FC<{
           actions={
             [
               <Button
+                key={item?.conversation_id}
                 onClick={() => {
                   conversation_id !== item?.conversation_id && setDefaultConvosation(item?.conversation_id);
                 }}
