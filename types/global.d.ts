@@ -8,6 +8,7 @@ declare global {
     userId?: string | number;
     description: string;
     isLoading?: boolean;
+    isError?: boolean;
   }
   interface IUser{
     id: string;

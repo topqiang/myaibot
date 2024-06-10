@@ -37,7 +37,6 @@ export async function getServerSideProps(context) {
       }
     }
   }
-  console.log(user, "----user");
   // 将用户信息作为 prop 传递给页面
   return { props: {
       user: {

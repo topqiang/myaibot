@@ -68,3 +68,6 @@ body {
 .ant-list-item {
   border-block-end: none !important;
 }
+:where(.css-dev-only-do-not-override-17seli4).ant-btn-primary{
+  background-color: #1677ff !important;
+}

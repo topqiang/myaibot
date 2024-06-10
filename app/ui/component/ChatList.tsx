@@ -7,8 +7,12 @@ import {
 } from 'antd';
 import api from '@/app/lib/api';
 
-const App: React.FC<{userId: number}> = ({
-  userId
+const App: React.FC<{
+  userId: number;
+  conversation_id: string;
+}> = ({
+  userId,
+  conversation_id
 }) => {
   const [list, setList] = useState([]);
   const getList = useCallback(async () => {
@@ -20,7 +24,7 @@ const App: React.FC<{userId: number}> = ({
     if(!res?.code){
       setList(res?.result?.sessionList)
     }
-    console.log(list, "----listlistlist");
+    console.log(list, "listlistlist");
   }, []);
 
   useEffect(() => {
@@ -48,11 +52,17 @@ const App: React.FC<{userId: number}> = ({
       dataSource={list}
       renderItem={(item) => (
         <List.Item
-          actions={[<Button
-            onClick={() => {
-              setDefaultConvosation(item?.conversation_id);
-            }}
-          >切换到当前会话</Button>]}
+          actions={
+            [
+              <Button
+                onClick={() => {
+                  conversation_id !== item?.conversation_id && setDefaultConvosation(item?.conversation_id);
+                }}
+              >
+                {conversation_id === item?.conversation_id ? "当前会话" : "切换为当前会话"}
+              </Button>
+            ]
+          }
         >
           {item?.title || item?.conversation_id}
         </List.Item>

@@ -5,31 +5,37 @@ const redisConfig = {
   port: process.env.REDIS_PORT ? +process.env.REDIS_PORT : 6379,
 };
 
-let redis: Redis;
-export async function setCache(key: string, value: string) {
+let redis: Redis = new Redis(redisConfig);
+export async function setCache(key: string, value: string, EX?: number) {
   try {
-    redis = new Redis(redisConfig); // 创建ioredis客户端实例
-    await redis.set(key, value); // 使用await等待set操作完成
+    // redis = new Redis(redisConfig); // 创建ioredis客户端实例
+    // console.log("----setCache", key, value);
+    if(EX){
+      await redis.set(key, value, "EX", EX); // 使用await等待set操作完成
+    }else {
+      await redis.set(key, value); // 使用await等待set操作完成
+    }
     return true;
   } catch (error) {
     console.error('Error setting value:', error);
   } finally {
-    redis.quit(); // 关闭客户端连接
+    // redis.quit(); // 关闭客户端连接
   }
   return false;
 }
 
 export async function getCache(key: string) {
   try {
-    redis = new Redis(redisConfig); // 创建ioredis客户端实例
+    // redis = new Redis(redisConfig); // 创建ioredis客户端实例
     const value = await redis.get(key); // 使用await等待get操作完成
+    // console.log("----getCache", key, value);
     if (value !== null) {
       return value;
     }
   } catch (error) {
     console.error('Error getting value:', error);
   } finally {
-    redis.quit(); // 关闭客户端连接
+    // redis.quit(); // 关闭客户端连接
   }
   return '';
 }

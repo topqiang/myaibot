@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-// import prisma from '../prismaClient';
+import prisma from '../prismaClient';
 import fetchWrapper from '@/utils/fetchWrapper';
+import checkIntention from '@/utils/checkIntention';
 // 直接读取 env
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -10,6 +11,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     "stream": true,
     "conversation_id": body?.conversation_id || "9f497954-95d2-457f-a600-15d4c455143f",
   };
+  if(body?.isFirst){
+    await prisma.session.update({
+      where: {
+        id: body?.session_id
+      },
+      data: {
+        title: body?.query
+      }
+    });
+  }
+  try {
+    const checkRes = await checkIntention(params?.query);
+    console.log(checkRes, "----checkRes");
+  } catch (error) {
+    console.log("意图识别报错", error);
+  }
   try {
     const remoteResponse = await fetchWrapper("/v2/app/conversation/runs", params);
     if(params?.stream){
@@ -28,7 +45,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           }
           const buffer = Buffer.from(value); // 使用 Buffer 将十进制字符编码转换成字符串
           const string = buffer.toString('utf8');
-          console.log(string, "buffer", new Date().getTime());
           res.write(string);
           // @ts-ignore
           res.flush();
@@ -41,5 +57,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } catch (error) {
     console.error('获取流式数据出错:', error);
+    res.status(405);
   }
 }

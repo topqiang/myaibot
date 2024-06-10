@@ -1,6 +1,6 @@
 "use client"
-import { Input, Tooltip, Spin, Modal } from "antd"
-import { LoadingOutlined, SwapOutlined} from "@ant-design/icons"
+import { Input, Tooltip, Spin, Modal, message } from "antd"
+import { LoadingOutlined, SwapOutlined} from "@ant-design/icons";
 import { useCallback, useEffect, useState, useRef } from "react";
 import { SendIcon, UserInfo, ChatList, Messages } from "@/app/ui/component/index";
 import api from '@/app/lib/api';
@@ -39,23 +39,25 @@ export default function Chat({user, messageList: defaultMessageList}) {
   const [messageList, setMessageList] = useState<IMessage[]>(defaultMessageList?.length > 0 ? defaultMessageList : data);
   const [loading, setLoading] = useState(false);
   const [modal, contextHolder] = Modal.useModal();
-  const chat = useCallback(() => {
+  const chat = useCallback((question: string, message_id?: string) => {
     if(!question.trim() || loading){
       return;
     }
-    const message_id = Date.now() + "";
-    setMessageList([...messageList, {
-      message_id,
-      title: user?.nickname,
-      userId: user.id,
-      description: question,
-    }, {
-      message_id: message_id + "callback",
-      title: '星哥小秘',
-      userId: 0,
-      isLoading: true,
-      description: "",
-    }]);
+    if(!message_id){
+      message_id = Date.now() + "";
+      setMessageList([...messageList, {
+        message_id,
+        title: user?.nickname,
+        userId: user.id,
+        description: question,
+      }, {
+        message_id: message_id + "callback",
+        title: '星哥小秘',
+        userId: 0,
+        isLoading: true,
+        description: "",
+      }]);
+    }
     setLoading(true);
     setQuestion("");
     fetch('/api/chat', {
@@ -65,7 +67,8 @@ export default function Chat({user, messageList: defaultMessageList}) {
       },
       body: JSON.stringify({
         query: question,
-        conversation_id: user?.conversation_id
+        isFirst: messageList.length === 1,
+        session_id: user?.session_id
       }),
     })
     .then(async streamResponse => {
@@ -92,8 +95,11 @@ export default function Chat({user, messageList: defaultMessageList}) {
               messageStr += parsedData.answer;
               setMessageList(prev => {
                 const newList = [...prev];
-                newList[newList.length - 1].description = messageStr;
-                newList[newList.length - 1].isLoading = !parsedData.is_completion;
+                const findIndex = newList.findIndex(i => i?.message_id === message_id + "callback");
+                if(findIndex > 0 ){
+                  newList[findIndex].description = messageStr;
+                  newList[findIndex].isLoading = !parsedData.is_completion;
+                }
                 return newList;
               });
             } catch (error) {
@@ -105,21 +111,49 @@ export default function Chat({user, messageList: defaultMessageList}) {
     })
     .catch(error => {
       console.error('获取流式数据出错:', error);
+      setMessageList(prev => {
+        const newList = [...prev];
+        const findIndex = newList.findIndex(i => i?.message_id === message_id + "callback");
+        if(findIndex > 0 ){
+          newList[findIndex].isError = true;
+          newList[findIndex].isLoading = false;
+        }
+        return newList;
+      }); 
     })
     .finally(() => {
       setLoading(false);
     });
-  }, [question, messageList, loading]);
+  }, [messageList, loading]);
 
   const chatComponent = {
     title: '切换会话',
     content: <ChatList
       userId={user.id}
+      conversation_id={user.conversation_id}
     />,
-    footer: null,
-    closable: true
-    // okText: '',
-    // cancelText: ''
+    // footer: null,
+    closable: true,
+    okText: '新建会话',
+    cancelText: '取消',
+    onOk: (close: () => void) => {
+      api("/api/session/add", {
+        userId: user?.id
+      }).then((res) => {
+        if(!res?.code){
+          message.success("创建成功！");
+          setTimeout(() => {
+            location.reload();
+          }, 2000);
+        }else{
+          message.info(res?.message || "未知错误！");
+        }
+      }).catch(() => {
+        message.error("发生异常！");
+      }).finally(() => {
+        close();
+      });
+    }
   };
 
   const updUser = {
@@ -135,16 +169,21 @@ export default function Chat({user, messageList: defaultMessageList}) {
       chatContainerRef.current.scrollTop = chatContainerRef.current?.scrollHeight;
     }
     const callFn = throttle(() => {
-      api("/api/chat/save", {
-        conversation_id: user?.conversation_id,
-        messageList
-      });
+      if(messageList.length > 2){
+        api("/api/chat/save", {
+          conversation_id: user?.conversation_id,
+          messageList
+        });
+      }
     }, 2000);
-    if(messageList.length > 2){
-      callFn();
-    }
+    callFn();
   }, [messageList, chatContainerRef]);
 
+  const reChat = useCallback((index: number) => {
+    const msg = messageList[index - 1];
+    chat(msg.description, msg.message_id);
+  }, [messageList, chat]);
+  
   return (
     <main className="blur-effect flex-1 flex flex-col divide-y divide-gray-700/50">
       <header className="justify-between flex flex-none flex  px-8 py-4 text-gray-300 leading-6">
@@ -167,6 +206,7 @@ export default function Chat({user, messageList: defaultMessageList}) {
           <Messages
             data={messageList}
             userId={user.id}
+            reChat={reChat}
           />
         </div>
         <div className="flex-none h-18 p-2">
@@ -177,10 +217,10 @@ export default function Chat({user, messageList: defaultMessageList}) {
               setQuestion(e.target.value);
             }}
             value={question}
-            onPressEnter={chat}
+            onPressEnter={() => chat(question)}
             suffix={
             <Tooltip title="点击发送">
-              <span className="cursor-pointer" onClick={chat}>
+              <span className="cursor-pointer" onClick={() => chat(question)}>
                 {loading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} /> : <SendIcon/>}
               </span>
             </Tooltip>

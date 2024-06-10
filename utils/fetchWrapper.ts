@@ -1,7 +1,7 @@
 const BASE_URL = 'https://qianfan.baidubce.com';
 
 // 封装通用的fetch函数
-async function fetchWrapper<T>(endpoint: string, data?: T, options = {headers:{}, method: 'POST'}) {
+async function fetchWrapper<T extends {app_id: string}>(endpoint: string, data?: T, options = {headers:{}, method: 'POST'}) {
   const headers = {
     'Content-Type': 'application/json',
     // 如果有鉴权Token, 可以在这里添加
@@ -11,7 +11,7 @@ async function fetchWrapper<T>(endpoint: string, data?: T, options = {headers:{}
   const URL = `${BASE_URL}${endpoint}`;
   const params = {
     body: JSON.stringify({
-        app_id: "cd4cf9a8-2c54-42c0-8d95-c463ca7ca252",
+        app_id: data?.app_id || "cd4cf9a8-2c54-42c0-8d95-c463ca7ca252",
         ...(data || {})
     }),
     ...options,
