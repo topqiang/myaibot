@@ -176,8 +176,8 @@ export default function Chat({user, messageList: defaultMessageList}) {
         });
       }
     }, 2000);
-    callFn();
-  }, [messageList, chatContainerRef]);
+    !loading && callFn();
+  }, [messageList, chatContainerRef, loading]);
 
   const reChat = useCallback((index: number) => {
     const msg = messageList[index - 1];

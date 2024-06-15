@@ -2,6 +2,7 @@
 import React from 'react';
 import { List, Avatar, Button } from 'antd';
 import { LoadingOutlined} from "@ant-design/icons";
+//@ts-ignore
 import Remarkable from 'react-remarkable'; // 引入react-remarkable组件
 
 const Messages: React.FC<{

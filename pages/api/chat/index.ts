@@ -3,10 +3,15 @@ import prisma from '../prismaClient';
 import fetchWrapper from '@/utils/fetchWrapper';
 import checkIntention from '@/utils/checkIntention';
 // 直接读取 env
-
+export interface IParams{
+  query: string;
+  stream: boolean;
+  conversation_id: string;
+  app_id?: string;
+}
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const body = req.body;
-  const params = {
+  const params: IParams = {
     "query": body?.query || "未来5年最好的行业和岗位有哪些？",
     "stream": true,
     "conversation_id": body?.conversation_id || "9f497954-95d2-457f-a600-15d4c455143f",
@@ -14,7 +19,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if(body?.isFirst){
     await prisma.session.update({
       where: {
-        id: body?.session_id
+        id: body?.session_id,
+        // conversation_id: body?.conversation_id
       },
       data: {
         title: body?.query
@@ -28,7 +34,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.log("意图识别报错", error);
   }
   try {
-    const remoteResponse = await fetchWrapper("/v2/app/conversation/runs", params);
+    const remoteResponse = await fetchWrapper<IParams>("/v2/app/conversation/runs", params);
     if(params?.stream){
       // res.setHeader('Content-Type', 'application/octet-stream'); // 设置合适的 Content-Type
       res.setHeader('Content-Type', 'text/event-stream');

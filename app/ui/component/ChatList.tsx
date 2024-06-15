@@ -50,12 +50,15 @@ const App: React.FC<{
       size="large"
       bordered
       dataSource={list}
-      renderItem={(item) => (
+      renderItem={(item: {
+        conversation_id: string;
+        title: string;
+      }, index) => (
         <List.Item
           actions={
             [
               <Button
-                key={item?.conversation_id}
+                key={item?.conversation_id || index}
                 onClick={() => {
                   conversation_id !== item?.conversation_id && setDefaultConvosation(item?.conversation_id);
                 }}

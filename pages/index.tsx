@@ -26,9 +26,11 @@ export default function Index({user, messageList}) {
 export async function getServerSideProps(context) {
   let user = await checkUser(context);
   let messageList = [];
+  let session_id = "";
   if(user?.activationCode){
     let a = await checkConversation(context, user);
     user = a.user;
+    session_id = a.user.session_id;
     if(typeof a.messageList === 'string' && a.messageList.length > 0){
       try {
         messageList = JSON.parse(a.messageList);
@@ -43,7 +45,8 @@ export async function getServerSideProps(context) {
         id: user?.id || "",
         nickname: user?.nickname || "",
         activationCode: user?.activationCode || "",
-        conversation_id: user?.conversation_id || ""
+        conversation_id: user?.conversation_id || "",
+        session_id
       },
       messageList
     }};
