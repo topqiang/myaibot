@@ -12,7 +12,8 @@ export default async ({req, res, params, query}, user) => {
     }
   });
   let messageList = '';
-  if(!user.conversation_id && conversation.length === 0){
+  console.log(conversation, "-----conversation")
+  if(!conversation || conversation.length === 0){
     // 调用百度创建会话
     const a = await fetchWrapper("/v2/app/conversation");
     if(!user?.conversation_id){
@@ -50,7 +51,7 @@ export default async ({req, res, params, query}, user) => {
     });
     user.conversation_id = conversation[0].conversation_id
     user.session_id = conversation[0].id;
-  } else {
+  } else if (conversation.length > 0) {
     const conversationIsInvalid = conversation.find(v => v.conversation_id === user.conversation_id);
     if(!conversationIsInvalid){
       await prisma.user.update({
