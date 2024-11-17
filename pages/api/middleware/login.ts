@@ -65,7 +65,7 @@ export default async ({req, res, params, query}) => {
     }
   }
   if(user?.id){
-    res.setHeader('Set-Cookie', `userId=${user?.id}; HttpOnly; Path=/; Max-Age=${3600 * 24 * 7}`);
+    res.setHeader('Set-Cookie', `userId=${user?.id}; Path=/; Max-Age=${3600 * 24 * 7}`);
   }
   return user;
 };
