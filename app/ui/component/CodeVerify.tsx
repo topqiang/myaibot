@@ -12,7 +12,7 @@ const App: React.FC<{
       code: text
     }).then(res => {
       if(!res.code){
-        location.reload();
+        location.href = "https://www.myai-club.top/posts";
       }
     });
   }, [userId]);
